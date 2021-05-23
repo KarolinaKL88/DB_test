@@ -17,3 +17,17 @@ def get_books_by_publishers(session, ascending=True):
             .group_by(Publisher.name)
             .order_by(direction("total_books"))
     )
+
+def get_authors_by_publishers(session, ascending=True):
+    if not isinstance(ascending, bool):
+        raise ValueError(f'Sorting value invalid: {ascending}.')
+
+    direction = asc if ascending else desc
+
+    return (
+        session
+            .query(Publisher.name, func.count(Author.first_name).label("total_authors"))
+            .join(Publisher.authors)
+            .group_by(Publisher.name)
+            .order_by(direction("total_authors"))
+    )
